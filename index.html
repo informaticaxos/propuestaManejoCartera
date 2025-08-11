@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Propuesta Técnica y Económica</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; background-color: #fdfdfd; }
+    h1, h2, h3 { color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    ul { margin-top: 0; }
+    .section { margin-top: 40px; }
+    .highlight { background-color: #eaf2f8; padding: 10px; border-left: 4px solid #3498db; }
+  </style>
+</head>
+<body>
+
+  <h1>PROPUESTA TÉCNICA Y ECONÓMICA</h1>
+  <h2>Desarrollo Web para Aplicativo de Gestión de Cartera</h2>
+
+  <div class="highlight">
+    <p><strong>Cliente:</strong> Neira Fernández Mirian Gabriela<br>
+    <strong>RUC:</strong> 0105626576001<br>
+    <strong>Dirección:</strong> Remigio Crespo 535 y Lorenzo Piedra<br>
+    <strong>Teléfono:</strong> 0991804907<br>
+    <strong>Correo electrónico:</strong> asesoriagn2020@gmail.com<br>
+    <strong>Proyecto:</strong> Desarrollo de Sistema de Gestión de Cartera<br>
+    <strong>Fecha de emisión:</strong> Miércoles 06 de agosto de 2025<br>
+    <strong>Validez de la propuesta:</strong> 15 días calendario</p>
+  </div>
+
+  <div class="section">
+    <h2>1. Información General</h2>
+    <p>Se propone el desarrollo de un sistema web para la gestión integral de cartera, orientado a optimizar el control de clientes, productos/servicios, órdenes de trabajo, cuentas por cobrar y usuarios. La plataforma será moderna, segura, escalable y accesible desde cualquier navegador compatible, permitiendo además la generación de reportes exportables en formatos PDF y Excel.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. Arquitectura y Tecnologías Utilizadas</h2>
+    <table>
+      <tr><th>Componente</th><th>Tecnología empleada</th></tr>
+      <tr><td>Frontend</td><td>React JS + Bootstrap 5</td></tr>
+      <tr><td>Backend</td><td>Node.js con Next.js</td></tr>
+      <tr><td>Base de datos</td><td>MySQL</td></tr>
+      <tr><td>Servidor</td><td>Node.js</td></tr>
+      <tr><td>Reportes</td><td>Exportación en PDF y Excel</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>3. Módulos del Sistema</h2>
+    <h3>3.1 Clientes</h3>
+    <ul>
+      <li>Campos: id, cedula/ruc, nombres, dirección, teléfono, email</li>
+      <li>Información adicional: clave SRI, firma electrónica, tipo de contribuyente, etc.</li>
+      <li>Reportes: PDF y Excel</li>
+      <li>Búsqueda: por RUC/cédula y nombres</li>
+    </ul>
+
+    <h3>3.2 Productos/Servicios</h3>
+    <ul>
+      <li>Campos: id, código, descripción, precio</li>
+      <li>Reportes: PDF y Excel</li>
+      <li>Búsqueda: por código y descripción</li>
+    </ul>
+
+    <h3>3.3 Orden de Trabajo</h3>
+    <ul>
+      <li>Cabecera: cliente, número de orden, fecha, método de pago, total, estado, días de crédito</li>
+      <li>Detalle: ítems tipo factura</li>
+      <li>Reportes: por fecha y cliente</li>
+      <li>Impresión: A4 y POS 80mm</li>
+    </ul>
+
+    <h3>3.4 Cuentas por Cobrar</h3>
+    <ul>
+      <li>Gestión de órdenes en estado “crédito”</li>
+      <li>Registro de abonos y egresos</li>
+      <li>Sección de caja con validación automática</li>
+      <li>Reportes: por fecha, cliente, abonos</li>
+      <li>Impresión: A4 y POS 80mm</li>
+    </ul>
+
+    <h3>3.5 Usuarios</h3>
+    <ul>
+      <li>Campos: id, nombres, usuario, contraseña, correo, teléfono</li>
+      <li>Roles: permisos por módulo</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>4. Cronograma de Implementación</h2>
+    <table>
+      <tr><th>Semana</th><th>Actividades principales</th><th>Módulos involucrados</th></tr>
+      <tr><td>1</td><td>Levantamiento de requerimientos, diseño UI</td><td>General</td></tr>
+      <tr><td>2</td><td>Clientes y Productos/Servicios</td><td>3.1 y 3.2</td></tr>
+      <tr><td>3</td><td>Orden de Trabajo y Cuentas por Cobrar</td><td>3.3 y 3.4</td></tr>
+      <tr><td>4</td><td>Finalización, pruebas, documentación</td><td>3.4 y 3.5</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>5. Presupuesto y Tiempo de Trabajo</h2>
+    <p><strong>Costo por módulo:</strong> $100 USD<br>
+    <strong>Total del proyecto:</strong> $500 USD<br>
+    <strong>Tarifa horaria:</strong> $10 USD/hora<br>
+    <strong>Tiempo estimado por módulo:</strong> 10 horas</p>
+  </div>
+
+  <div class="section">
+    <h2>6. Entregables</h2>
+    <ul>
+      <li>Aplicación web funcional</li>
+      <li>Base de datos documentada</li>
+      <li>Reportes PDF/Excel</li>
+      <li>Manual de usuario y guía técnica</li>
+      <li>Hosting local de prueba</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>7. Condiciones de Contratación</h2>
+    <ul>
+      <li>Pago: 50% al inicio, 50% al finalizar</li>
+      <li>Responsabilidad del cliente: servidor final</li>
+      <li>Cambios de alcance: cotizados aparte</li>
+      <li>Revisiones: hasta dos por módulo</li>
+      <li>Garantía: 30 días para corrección de errores</li>
+      <li>Confidencialidad: protección total de la información</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>8. Condiciones Complementarias</h2>
+    <ul>
+      <li>Propiedad intelectual: del cliente tras el pago</li>
+      <li>Uso en portafolio: permitido sin datos sensibles</li>
+      <li>Soporte posterior: bajo demanda o contrato mensual</li>
+      <li>Despliegue en servidor productivo: asistencia incluida</li>
+      <li>Formato de entrega: .zip, .docx, .pdf</li>
+      <li>Navegadores compatibles: Chrome, Firefox, Edge</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>9. Seguridad y Escalabilidad</h2>
+    <ul>
+      <li>Seguridad: cifrado de contraseñas, control de acceso, respaldo periódico</li>
+      <li>Escalabilidad: arquitectura modular</li>
+      <li>Diseño adaptable: interfaz responsive</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>10. Soporte Técnico Post-Entrega</h2>
+    <ul>
+      <li>Corrección de errores: incluida durante la garantía</
