@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario Dinámico de Cliente</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    .hidden { display: none; }
+  </style>
+</head>
+<body class="p-4 bg-light">
+  <div class="container">
+    <h2 class="mb-4">Formulario Personalizado para Cliente</h2>
+
+    <!-- Selector de tipo de formulario -->
+    <div class="mb-3">
+      <label for="tipoFormulario" class="form-label">Tipo de Formulario</label>
+      <select id="tipoFormulario" class="form-select" onchange="mostrarFormulario()">
+        <option value="">-- Selecciona --</option>
+        <option value="firma">Firma Electrónica</option>
+        <option value="credenciales">Credenciales de Acceso</option>
+      </select>
+    </div>
+
+    <!-- Formulario: Firma Electrónica -->
+    <form id="formFirma" class="hidden" enctype="multipart/form-data">
+      <h4>Firma Electrónica</h4>
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" name="nombre_firma" class="form-control" placeholder="Firma electrónica">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fecha de Caducidad</label>
+        <input type="date" name="fecha_caducidad" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Observaciones</label>
+        <textarea name="observaciones_firma" class="form-control" rows="3"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Archivo (.p12)</label>
+        <input type="file" name="archivo_firma" accept=".p12" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar Firma</button>
+    </form>
+
+    <!-- Formulario: Credenciales de Acceso -->
+    <form id="formCredenciales" class="hidden">
+      <h4>Credenciales de Acceso</h4>
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" name="nombre_credencial" class="form-control" placeholder="Contraseña de acceso">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <input type="text" name="usuario" class="form-control" placeholder="Ej. 0105945059001">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fecha de Declaración</label>
+        <input type="date" name="fecha_declaracion" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Observaciones</label>
+        <textarea name="observaciones_credencial" class="form-control" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-success">Guardar Credenciales</button>
+    </form>
+  </div>
+
+  <script>
+    function mostrarFormulario() {
+      const tipo = document.getElementById('tipoFormulario').value;
+      document.getElementById('formFirma').classList.add('hidden');
+      document.getElementById('formCredenciales').classList.add('hidden');
+
+      if (tipo === 'firma') {
+        document.getElementById('formFirma').classList.remove('hidden');
+      } else if (tipo === 'credenciales') {
+        document.getElementById('formCredenciales').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
