@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación Técnica - Sistema de Gestión</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+        }
+
+        section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        pre {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .diagram {
+            font-family: monospace;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <header>
+        <h1>📘 Documentación Técnica del Sistema de Gestión</h1>
+        <p>Incluye SQL de creación, descripción de campos y diagrama ER</p>
+    </header>
+
+    <section>
+        <h2>🧱 SQL de Creación de Tablas</h2>
+        <pre>
+-- Tabla: usuarios
+CREATE TABLE usuarios (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(255) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  rol ENUM('admin', 'vendedor', 'contador') NOT NULL,
+  activo BOOLEAN DEFAULT TRUE,
+  creado DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabla: clientes
+CREATE TABLE clientes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(255) NOT NULL,
+  identificacion VARCHAR(50) NOT NULL,
+  direccion TEXT,
+  telefono VARCHAR(50),
+  email VARCHAR(100),
+  activo BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla: productos
+CREATE TABLE productos (
+  codigo VARCHAR(50) PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  precio_base DECIMAL(10,2) NOT NULL,
+  activo BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla: metodos_pago
+CREATE TABLE metodos_pago (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL,
+  descripcion TEXT,
+  activo BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla: ordenes_cabecera
+CREATE TABLE ordenes_cabecera (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  id_cliente INT NOT NULL,
+  id_usuario INT NOT NULL,
+  descripcion TEXT,
+  estado ENUM('pendiente', 'pagada', 'anulada') DEFAULT 'pendiente',
+  fecha DATE NOT NULL,
+  credito INT DEFAULT 0,
+  id_metodo_pago INT,
+  total DECIMAL(10,2) DEFAULT 0,
+  contable BOOLEAN DEFAULT TRUE,
+  creado DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_cliente) REFERENCES clientes(id),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
+  FOREIGN KEY (id_metodo_pago) REFERENCES metodos_pago(id)
+);
+
+-- Tabla: ordenes_detalle
+CREATE TABLE ordenes_detalle (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  id_orden INT NOT NULL,
+  codigo_producto VARCHAR(50) NOT NULL,
+  descripcion VARCHAR(255),
+  cantidad INT NOT NULL,
+  precio_unitario DECIMAL(10,2) NOT NULL,
+  subtotal DECIMAL(10,2) GENERATED ALWAYS AS (cantidad * precio_unitario) STORED,
+  FOREIGN KEY (id_orden) REFERENCES ordenes_cabecera(id),
+  FOREIGN KEY (codigo_producto) REFERENCES productos(codigo)
+);
+
+-- Tabla: abonos
+CREATE TABLE abonos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  id_orden INT NOT NULL,
+  fecha DATE NOT NULL,
+  monto DECIMAL(10,2) NOT NULL,
+  saldo_antes DECIMAL(10,2),
+  saldo_despues DECIMAL(10,2),
+  comprobante VARCHAR(100),
+  id_metodo_pago INT,
+  observaciones TEXT,
+  FOREIGN KEY (id_orden) REFERENCES ordenes_cabecera(id),
+  FOREIGN KEY (id_metodo_pago) REFERENCES metodos_pago(id)
+);
+
+-- Tabla: movimientos
+CREATE TABLE movimientos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  tipo ENUM('ingreso', 'egreso', 'ajuste') NOT NULL,
+  fecha DATE NOT NULL,
+  monto DECIMAL(10,2) NOT NULL,
+  descripcion TEXT,
+  id_metodo_pago INT,
+  id_usuario INT,
+  contable BOOLEAN DEFAULT TRUE,
+  creado DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_metodo_pago) REFERENCES metodos_pago(id),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+);
+  </pre>
+    </section>
+
+
+    <section>
+        <h2>📘 Descripción de Campos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tabla</th>
+                    <th>Campo</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>clientes</td>
+                    <td>Datos personales</td>
+                    <td>Identificación, contacto y estado del cliente</td>
+                </tr>
+                <tr>
+                    <td>productos</td>
+                    <td>Catálogo</td>
+                    <td>Código, nombre, descripción y precio base</td>
+                </tr>
+                <tr>
+                    <td>metodos_pago</td>
+                    <td>Formas de pago</td>
+                    <td>Nombre, descripción y estado activo</td>
+                </tr>
+                <tr>
+                    <td>usuarios</td>
+                    <td>Personal del sistema</td>
+                    <td>Nombre, email, rol y estado</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>Cabecera de orden</td>
+                    <td>Cliente, usuario, estado, fecha, crédito, método de pago, total, contable</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>Ítems de orden</td>
+                    <td>Producto, cantidad, precio, subtotal, descripción</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>Pagos parciales</td>
+                    <td>Fecha, monto, saldo antes/después, método de pago, comprobante</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>Flujo de caja</td>
+                    <td>Tipo, fecha, monto, concepto, método, cliente, comprobante</td>
+                </tr>
+                <tr>
+                    <td>arqueos_caja</td>
+                    <td>Cierre diario</td>
+                    <td>Fecha, hora, usuario, ingresos, egresos, saldo físico, diferencia, estado</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+
+    <section>
+        <h2>📘 Descripción de Atributos por Tabla</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tabla</th>
+                    <th>Atributo</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- CLIENTES -->
+                <tr>
+                    <td>clientes</td>
+                    <td>id</td>
+                    <td>INT</td>
+                    <td>Identificador único del cliente</td>
+                </tr>
+                <tr>
+                    <td>clientes</td>
+                    <td>nombre</td>
+                    <td>VARCHAR(255)</td>
+                    <td>Nombre completo del cliente</td>
+                </tr>
+                <tr>
+                    <td>clientes</td>
+                    <td>identificacion</td>
+                    <td>VARCHAR(50)</td>
+                    <td>Documento o RUC</td>
+                </tr>
+                <tr>
+                    <td>clientes</td>
+                    <td>direccion</td>
+                    <td>TEXT</td>
+                    <td>Dirección física o comercial</td>
+                </tr>
+                <tr>
+                    <td>clientes</td>
+                    <td>telefono</td>
+                    <td>VARCHAR(50)</td>
+                    <td>Teléfono de contacto</td>
+                </tr>
+                <tr>
+                    <td>clientes</td>
+                    <td>email</td>
+                    <td>VARCHAR(100)</td>
+                    <td>Correo electrónico</td>
+                </tr>
+                <tr>
+                    <td>clientes</td>
+                    <td>activo</td>
+                    <td>BOOLEAN</td>
+                    <td>Estado del cliente</td>
+                </tr>
+
+                <!-- PRODUCTOS -->
+                <tr>
+                    <td>productos</td>
+                    <td>codigo</td>
+                    <td>VARCHAR(50)</td>
+                    <td>Código único del producto</td>
+                </tr>
+                <tr>
+                    <td>productos</td>
+                    <td>nombre</td>
+                    <td>VARCHAR(255)</td>
+                    <td>Nombre comercial</td>
+                </tr>
+                <tr>
+                    <td>productos</td>
+                    <td>descripcion</td>
+                    <td>TEXT</td>
+                    <td>Detalles del producto</td>
+                </tr>
+                <tr>
+                    <td>productos</td>
+                    <td>precio_base</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Precio unitario base</td>
+                </tr>
+                <tr>
+                    <td>productos</td>
+                    <td>activo</td>
+                    <td>BOOLEAN</td>
+                    <td>Estado del producto</td>
+                </tr>
+
+                <!-- METODOS_PAGO -->
+                <tr>
+                    <td>metodos_pago</td>
+                    <td>id</td>
+                    <td>INT</td>
+                    <td>Identificador del método</td>
+                </tr>
+                <tr>
+                    <td>metodos_pago</td>
+                    <td>nombre</td>
+                    <td>VARCHAR(50)</td>
+                    <td>Nombre del método</td>
+                </tr>
+                <tr>
+                    <td>metodos_pago</td>
+                    <td>descripcion</td>
+                    <td>TEXT</td>
+                    <td>Detalles o condiciones</td>
+                </tr>
+                <tr>
+                    <td>metodos_pago</td>
+                    <td>activo</td>
+                    <td>BOOLEAN</td>
+                    <td>Estado del método</td>
+                </tr>
+
+                <!-- USUARIOS -->
+                <tr>
+                    <td>usuarios</td>
+                    <td>id</td>
+                    <td>INT</td>
+                    <td>Identificador del usuario</td>
+                </tr>
+                <tr>
+                    <td>usuarios</td>
+                    <td>nombre</td>
+                    <td>VARCHAR(255)</td>
+                    <td>Nombre completo</td>
+                </tr>
+                <tr>
+                    <td>usuarios</td>
+                    <td>email</td>
+                    <td>VARCHAR(100)</td>
+                    <td>Correo electrónico</td>
+                </tr>
+                <tr>
+                    <td>usuarios</td>
+                    <td>rol</td>
+                    <td>ENUM</td>
+                    <td>Rol del usuario</td>
+                </tr>
+                <tr>
+                    <td>usuarios</td>
+                    <td>activo</td>
+                    <td>BOOLEAN</td>
+                    <td>Estado del usuario</td>
+                </tr>
+
+                <!-- ORDENES_CABECERA -->
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>id</td>
+                    <td>INT</td>
+                    <td>Identificador de la orden</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>id_cliente</td>
+                    <td>INT</td>
+                    <td>Cliente asociado</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>id_usuario</td>
+                    <td>INT</td>
+                    <td>Usuario responsable</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>descripcion</td>
+                    <td>TEXT</td>
+                    <td>Observaciones generales</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>estado</td>
+                    <td>ENUM</td>
+                    <td>Estado de la orden</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>fecha</td>
+                    <td>DATE</td>
+                    <td>Fecha de la orden</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>credito</td>
+                    <td>INT</td>
+                    <td>Días de crédito</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>id_metodo_pago</td>
+                    <td>INT</td>
+                    <td>Método de pago</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>total</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Total de la orden</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>contable</td>
+                    <td>BOOLEAN</td>
+                    <td>Si afecta contabilidad</td>
+                </tr>
+                <tr>
+                    <td>ordenes_cabecera</td>
+                    <td>creado</td>
+                    <td>DATETIME</td>
+                    <td>Fecha de creación</td>
+                </tr>
+
+                <!-- ORDENES_DETALLE -->
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>id</td>
+                    <td>INT</td>
+                    <td>Identificador del ítem</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>id_orden</td>
+                    <td>INT</td>
+                    <td>Orden asociada</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>codigo_producto</td>
+                    <td>VARCHAR(50)</td>
+                    <td>Producto vendido</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>descripcion</td>
+                    <td>VARCHAR(255)</td>
+                    <td>Detalle del ítem</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>cantidad</td>
+                    <td>INT</td>
+                    <td>Cantidad vendida</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>precio_unitario</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Precio por unidad</td>
+                </tr>
+                <tr>
+                    <td>ordenes_detalle</td>
+                    <td>subtotal</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Subtotal calculado</td>
+                </tr>
+
+                <!-- ABONOS -->
+                <tr>
+                    <td>abonos</td>
+                    <td>id</td>
+                    <td>INT</td>
+                    <td>Identificador del abono</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>id_orden</td>
+                    <td>INT</td>
+                    <td>Orden relacionada</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>fecha</td>
+                    <td>DATE</td>
+                    <td>Fecha del abono</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>monto</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Monto abonado</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>saldo_antes</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Saldo antes del abono</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>saldo_despues</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Saldo después del abono</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>comprobante</td>
+                    <td>VARCHAR(100)</td>
+                    <td>Referencia del comprobante</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>id_metodo_pago</td>
+                    <td>INT</td>
+                    <td>Método de pago</td>
+                </tr>
+                <tr>
+                    <td>abonos</td>
+                    <td>observaciones</td>
+                    <td>TEXT</td>
+                    <td>Comentarios adicionales</td>
+                </tr>
+
+                <!-- MOVIMIENTOS -->
+                <tr>
+                    <td>movimientos</td>
+                    <td>fecha</td>
+                    <td>DATE</td>
+                    <td>Fecha del movimiento</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>monto</td>
+                    <td>DECIMAL(10,2)</td>
+                    <td>Valor del movimiento</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>descripcion</td>
+                    <td>TEXT</td>
+                    <td>Detalle o motivo del movimiento</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>id_metodo_pago</td>
+                    <td>INT</td>
+                    <td>Método de pago utilizado</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>id_usuario</td>
+                    <td>INT</td>
+                    <td>Usuario que registró el movimiento</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>contable</td>
+                    <td>BOOLEAN</td>
+                    <td>Indica si afecta contabilidad</td>
+                </tr>
+                <tr>
+                    <td>movimientos</td>
+                    <td>creado</td>
+                    <td>DATETIME</td>
+                    <td>Fecha de creación del registro</td>
+                </tr>
+
+
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Sección: Formularios Dinámicos Asignados a Clientes -->
+    <div class="container mt-5">
+        <h3 class="mb-4">Formularios Asignados a Clientes</h3>
+
+        <form id="formAsignacionFormulario">
+            <div class="mb-3">
+                <label class="form-label">Seleccionar Cliente</label>
+                <select name="id_cliente" class="form-select">
+                    <!-- Opciones generadas dinámicamente desde la base de datos -->
+                    <option value="1">Cliente #1 - Juan Pérez</option>
+                    <option value="2">Cliente #2 - María Gómez</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Seleccionar Formulario</label>
+                <select name="id_formulario" class="form-select">
+                    <!-- Opciones generadas dinámicamente desde la base de datos -->
+                    <option value="1">Credenciales de Cliente</option>
+                    <option value="2">Documentación Legal</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Asignar Formulario</button>
+        </form>
+
+        <hr>
+
+        <h5 class="mt-4">Formularios Asignados</h5>
+        <table class="table table-bordered bg-white">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Formulario</th>
+                    <th>Campos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas generadas dinámicamente -->
+                <tr>
+                    <td>Juan Pérez</td>
+                    <td>Credenciales de Cliente</td>
+                    <td>firma_electronica, contrasena, fecha_vencimiento</td>
+                    <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="container mt-5">
+        <h3 class="mb-4">Formularios Dinámicos por Cliente</h3>
+
+        <form id="formularioAsignado" class="mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Cliente</label>
+                    <select name="id_cliente" class="form-select">
+                        <option value="1">Juan Pérez</option>
+                        <option value="2">María Gómez</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Formulario</label>
+                    <select name="id_formulario" class="form-select">
+                        <option value="1">Credenciales de Cliente</option>
+                        <option value="2">Documentación Legal</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Asignar Formulario</button>
+        </form>
+
+        <table class="table table-bordered bg-white">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Formulario</th>
+                    <th>Campos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Juan Pérez</td>
+                    <td>Credenciales de Cliente</td>
+                    <td>firma_electronica, contrasena, fecha_vencimiento</td>
+                    <td><button class="btn btn-sm btn-primary">Ver</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <section>
+        <h2>🧠 Diagrama Entidad-Relación (ER)</h2>
+        <p>
+            El siguiente diagrama representa la estructura relacional del sistema, incluyendo las entidades principales,
+            sus atributos clave y las relaciones entre ellas. Este modelo permite visualizar la lógica de negocio, las
+            dependencias entre tablas y los flujos de información que sustentan el sistema.
+        </p>
+
+        <figure>
+            <img src="https://bing.com/th/id/BCO.c4158314-baf3-4154-9e93-272e8246eeaf.png"
+                alt="Diagrama ER del sistema de gestión"
+                style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 8px;">
+            <figcaption>Figura: Diagrama ER con entidades como clientes, productos, órdenes, abonos, movimientos y
+                usuarios. Las relaciones están normalizadas mediante claves foráneas.</figcaption>
+        </figure>
+
+        <p>
+            Las relaciones están normalizadas y reflejan integridad referencial mediante claves primarias y foráneas.
+            Las entidades como <strong>ordenes_cabecera</strong> y <strong>ordenes_detalle</strong> permiten una
+            estructura modular para registrar transacciones, mientras que <strong>abonos</strong> y
+            <strong>movimientos</strong> capturan el flujo financiero asociado.
+        </p>
+    </section>
+
+</body>
+
+</html>
